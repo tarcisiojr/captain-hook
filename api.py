@@ -21,10 +21,10 @@ async def shutdown():
     pass
 
 
-from app.rest.domain_schema_rest import router as schema_router
+from app.rest.schema_rest import router as schema_router
 from app.rest.domain_rest import router as domain_router
 from app.rest.hook_config_rest import router as config_router
-from app.rest.health_chek_rest import router as health_router
+from app.rest.health_check_rest import router as health_router
 
 
 app.include_router(health_router)

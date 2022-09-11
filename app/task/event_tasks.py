@@ -27,6 +27,7 @@ def _on_failure(task, exc, task_id, args, kwargs, einfo):
     on_failure=_on_failure,
 )
 def _process_event(event_id):
+    logger.debug(f'Starting to process event: {event_id}')
     _call_service(event_service.process_event, event_id=event_id)
 
 

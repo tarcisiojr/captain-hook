@@ -1,7 +1,7 @@
 from typing import List
 
 from app.domain.hook import Hook
-from app.repository import base_repository
+from app.repository import base_repository, hook_repository
 from app.service import schema_service
 
 
@@ -12,3 +12,10 @@ async def create_hook_config(hook: Hook) -> Hook:
 
 async def find_hooks_by_example(example: Hook) -> List[Hook]:
     return await base_repository.find_by_example(example, return_as=Hook, limit=0)
+
+
+async def find_eligible_hooks(schema_name: str, event_name: str, tags: List[List[str]]) -> List[Hook]:
+    result = []
+    for filter_tags in tags if tags else [[]]:
+        result.extend(await hook_repository.find_eligible_hooks(schema_name, event_name, filter_tags))
+    return result

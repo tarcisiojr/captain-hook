@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from fastapi.openapi.models import Schema
 from pydantic import BaseModel, Field, HttpUrl
@@ -34,6 +34,7 @@ class KeyDomainSchemaRequest(HookBaseDomain):
 class DomainRequest(HookBaseDomain):
     domain_id: str = Field(..., example='1234567890')
     data: dict = Field(..., example={"name": "Eggs", "price": 34.99})
+    tags: Optional[List[List[str]]] = Field(..., example=[["tenant-x"]])
 
 
 class FindDomainRequest(Pagination, HookBaseDomain):
@@ -45,13 +46,22 @@ class DomainEventRequest(HookBaseDomain):
     metadata: Optional[dict] = Field(..., example={"new_price": 30050})
 
 
+class WebhookRequest(HookBaseDomain):
+    callback_url: HttpUrl = Field(..., example='https://example.com/')
+    delay_time: int = Field(0, description='Wait time to trigger http request')
+    http_headers: Optional[Dict[str, str]] = Field(..., description='Custom headers for http request')
+    timeout: Optional[int] = Field(3, description='Timeout for http request')
+    max_retries: Optional[int] = Field(3, description='Max retries in case of http request exception')
+
+
 class HookConfigRequest(HookBaseDomain):
     type: HookType
     schema_name: str = Field(..., example='price')
     event_name: str = Field(..., example='price_changed')
     condition: Optional[str] = Field(None, example='event.metadata.new_price > 20000')
     delay_time: Optional[int] = Field(0, description='Tempo em minutos para disparo do hook.')
-    callback: Optional[HttpUrl] = Field(..., example='https://example.com/')
+    webhook: Optional[WebhookRequest]
+    tags: Optional[List[str]] = Field(..., example=["tenant-x"])
 
 
 class FindHookConfigRequest(Pagination, HookBaseDomain):

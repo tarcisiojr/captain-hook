@@ -6,7 +6,7 @@ config_obj = {
     "imports": ("app.task.event_tasks",),
     "broker_url": "amqp://",
     "result_backend": "redis://localhost",
-    "task_always_eager": True
+    "task_always_eager": False
 }
 
 celery = Celery(**config_obj)

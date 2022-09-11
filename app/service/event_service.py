@@ -24,7 +24,7 @@ async def _process_webhook(event: DomainEvent):
 
 async def dispatch_event(event: DomainEvent):
     if event.hook.type == HookType.WEBHOOK:
-        logger.info(f"Disparando evento '{event.event_name}' para {event.schema_name}/{event.domain_id}: {event.id}")
+        logger.info(f"Agendando evento '{event.event_name}' para {event.schema_name}/{event.domain_id}: {event.id}")
         await event_tasks.dispatch_event(event)
 
 

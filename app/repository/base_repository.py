@@ -1,18 +1,15 @@
 import typing
 from functools import partial
-from typing import Tuple, Type
+from typing import Type
 
 from bson import ObjectId
 from pymongo import ReturnDocument
 from pymongo.results import InsertOneResult
 
-from app.domain.hook import HookBaseDomain, OID
-from app.repository.mongo.database import default_database
-from app.utils.misc import get_meta, utcnow
-
-
-class RepositoryException(Exception):
-    pass
+from app.domain.hook import HookBaseDomain
+from app.repository.mongo import database
+from app.repository.mongo.database import default_database, from_mongo
+from app.repository.utils import split_key_and_values, get_collection_name, fill_audit
 
 
 E = typing.TypeVar("E", bound=HookBaseDomain)
@@ -27,46 +24,8 @@ def _set_document_id(document: dict):
     return document
 
 
-def get_collection_name(entity: E) -> str:
-    return get_meta(entity, "collection_name")
-
-
-def _is_oid(value, key, type_hints):
-    return isinstance(value, ObjectId) or type_hints.get(key, None) == OID
-
-
-def split_key_and_values(entity: E, to_dict_opts: dict = None) -> Tuple[dict, dict]:
-    key_filter = {}
-    dict_entity = entity.dict(**to_dict_opts or {})
-    key = get_meta(entity, "key", raise_exc=False)
-
-    if not key:
-        key = list(dict_entity.keys())
-
-    type_hints = typing.get_type_hints(entity)
-
-    for key_attr in key:
-        key_filter[key_attr] = dict_entity.pop(key_attr)
-
-        if not key_filter[key_attr]:
-            raise RepositoryException(f"A chave não pode ter atributos nulos: {key_attr}")
-
-        if _is_oid(key_filter[key_attr], key_attr, type_hints):
-            value = key_filter.pop(key_attr)
-            key_filter["_id"] = ObjectId(value) if type(value) == str else value
-
-    return key_filter, dict_entity
-
-
-def from_mongo(entity_cls: Type[E], document: dict) -> E:
-    data_copy = dict(document)
-    document_id = data_copy.pop("id", None)
-    document_id = data_copy.pop("_id", document_id)
-    return entity_cls(**data_copy, id=OID(document_id))
-
-
 async def create(entity: E) -> E:
-    mongo_dict = await _fill_audit(_set_document_id(entity.dict()))
+    mongo_dict = await fill_audit(_set_document_id(entity.dict()))
     insert_result: InsertOneResult = await default_database[get_collection_name(entity)].insert_one(mongo_dict)
     document_id = insert_result.inserted_id
     inserted_document = {"_id": document_id, **mongo_dict}
@@ -76,7 +35,7 @@ async def create(entity: E) -> E:
 
 async def update(entity: E, return_as: Type[E] = None) -> E:
     key_filter, dict_entity = split_key_and_values(entity, {"exclude_unset": True})
-    dict_entity = await _fill_audit(dict_entity)
+    dict_entity = await fill_audit(dict_entity)
 
     updated = await default_database[get_collection_name(entity)].find_one_and_update(
         key_filter, {"$set": dict_entity}, return_document=ReturnDocument.AFTER
@@ -116,41 +75,13 @@ async def _get_collection(entity):
     return default_database[get_collection_name(entity)]
 
 
-async def _exists(entity: E, key_filter):
-    return await default_database[get_collection_name(entity)].count_documents(key_filter) > 0
-
-
-def _create_audit_info():
-    now = utcnow()
-    sub, iss = 'unknown', 'unknown'
-    audit_info = {"updated_by": {"subject": sub, "issuer": iss}, "updated_at": now}
-    return audit_info
-
-
-async def _fill_audit(dict_entity, exists_fnc=None):
-    audit_info = _create_audit_info()
-
-    if not exists_fnc or (exists_fnc and not await exists_fnc()):
-        audit_info["created_by"] = audit_info["updated_by"]
-        audit_info["created_at"] = audit_info["updated_at"]
-
-    return {**dict_entity, **audit_info}
-
-
 async def upsert(entity: E) -> E:
-    key_filter, dict_entity = split_key_and_values(entity, {"exclude_unset": True})
-    dict_entity = await _fill_audit(dict_entity, partial(_exists, entity, key_filter))
-
-    updated = await default_database[get_collection_name(entity)].find_one_and_update(
-        key_filter, {"$set": dict_entity}, upsert=True, return_document=ReturnDocument.AFTER
-    )
-
-    return from_mongo(type(entity), updated) if updated else None
+    return await database.upsert(entity, partial(get_collection_name, entity=entity))
 
 
 async def replace(entity: E) -> E:
     key_filter, dict_entity = split_key_and_values(entity)
-    dict_entity = await _fill_audit(dict_entity, False)
+    dict_entity = await fill_audit(dict_entity, False)
 
     replaced = await default_database[get_collection_name(entity)].find_one_and_replace(
         key_filter, {**key_filter, **dict_entity}, upsert=True, return_document=ReturnDocument.AFTER

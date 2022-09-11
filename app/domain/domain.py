@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from fastapi.openapi.models import Schema
 from pydantic import Field
@@ -20,6 +20,7 @@ class Domain(HookBaseDomain):
     domain_id: Optional[str] = Field(None, example='1234567890')
     schema_name: Optional[str] = Field(None, example='price')
     data: Optional[dict] = Field(None, example={"name": "Eggs", "price": 34.99})
+    tags: Optional[List[List[str]]] = Field(None, example=[["tenant-x"]])
 
     class Meta:
         collection_name: str = "domain"

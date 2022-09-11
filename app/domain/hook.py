@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict, List
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -39,14 +39,23 @@ class HookType(str, Enum):
     QUEUE = 'queue'
 
 
+class Webhook(HookBaseDomain):
+    callback_url: Optional[HttpUrl]
+    delay_time: Optional[int]
+    http_headers: Optional[Dict[str, str]]
+    timeout: Optional[int] = Field(3)
+    max_retries: Optional[int] = Field(3)
+    attempts: Optional[int] = Field(0)
+
+
 class Hook(HookBaseDomain):
     id: Optional[OID]
     type: Optional[HookType]
     schema_name: Optional[str]
     event_name: Optional[str]
     condition: Optional[str]
-    delay_time: Optional[int] = Field(None, description='Tempo em minutos para disparo do hook.')
-    callback: Optional[HttpUrl]
+    webhook: Optional[Webhook]
+    tags: Optional[List[str]]
 
     class Meta:
         collection_name: str = "domain_schema"
