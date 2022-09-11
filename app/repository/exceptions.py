@@ -1,0 +1,4 @@
+
+
+class IntegrityException(Exception):
+    pass

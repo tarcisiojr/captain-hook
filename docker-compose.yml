@@ -1,0 +1,44 @@
+version: '2.2'
+
+services:
+  mongo:
+    image: mongo:4.2.7-bionic
+    hostname: mongo
+    ports:
+      - "27017:27017"
+    command: mongod
+    expose:
+      - 27017
+
+  postgres:
+    image: postgres:14.5
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+    expose:
+      - 5432
+
+  redis:
+    image: redis:6.2.2-alpine
+    hostname: redis
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
+
+  rabbitmq:
+    image: rabbitmq:3.9-management-alpine
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15671:15671"
+      - "25676:25676"
+      - "15672:15672"
+    expose:
+      - 5672
+      - 15671
+      - 25676
+      - 15672
