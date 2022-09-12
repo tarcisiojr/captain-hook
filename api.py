@@ -35,16 +35,16 @@ app.include_router(domain_router)
 
 def _exception_handler(_request: Request, _exc: Exception):
     if isinstance(_exc, RecordNotFoundException):
-        return JSONResponse(status_code=404, content={"message": str(_exc), "details": _exc.details})
+        return JSONResponse(status_code=404, content={"message": str(_exc), "detail": _exc.details})
 
     if isinstance(_exc, IntegrityException):
         return JSONResponse(status_code=422, content={})
 
     if isinstance(_exc, ValidationException):
-        return JSONResponse(status_code=422, content={"message": str(_exc), "details": _exc.details})
+        return JSONResponse(status_code=422, content={"message": str(_exc), "detail": _exc.details})
 
     logger.error(_exc)
-    return JSONResponse(status_code=500, content={'details': str(_exc)})
+    return JSONResponse(status_code=500, content={"message": str(_exc), 'detail': str(_exc)})
 
 
 app.add_exception_handler(Exception, _exception_handler)

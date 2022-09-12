@@ -1,11 +1,15 @@
 from typing import List
 
-from app.domain.hook import Hook
+from app.domain.hook import Hook, HookType
 from app.repository import base_repository, hook_repository
 from app.service import schema_service
+from app.service.exceptions import ValidationException
 
 
 async def create_hook_config(hook: Hook) -> Hook:
+    if hook.type == HookType.WEBHOOK and not hook.webhook:
+        raise ValidationException(f"Attribute 'webhook' is required when type is '{HookType.WEBHOOK}'")
+
     await schema_service.exists_schema(hook.schema_name)
     return await base_repository.create(hook)
 

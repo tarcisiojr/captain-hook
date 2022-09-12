@@ -15,15 +15,20 @@ logger = logging.getLogger(__name__)
 
 async def _process_webhook(event: DomainEvent):
     payload = event.json(include={'id', 'event_name', 'schema_name', 'domain_id'})
-    logger.info(f'Realizando chamada na api "{event.hook.callback}": {payload}')
-    resp = requests.post(event.hook.callback, data=payload, headers={"Content-Type": "application/json"})
-    logger.info(f'Realizando chamada na api "{event.hook.callback}" '
+    logger.info(f'Realizando chamada na api "{event.hook.webhook.callback_url}": {payload}')
+    resp = requests.post(event.hook.webhook.callback_url,
+                         data=payload,
+                         headers={
+                             "Content-Type": "application/json",
+                             **(event.hook.webhook.http_headers if event.hook.webhook.http_headers else {}),
+                         })
+    logger.info(f'Realizando chamada na api "{event.hook.webhook.callback_url}" '
                 f'para evento {event.id}: HTTP Status={resp.status_code}')
     resp.raise_for_status()
 
 
 async def dispatch_event(event: DomainEvent):
-    if event.hook.type == HookType.WEBHOOK:
+    if event.hook.type == HookType.WEBHOOK and event.hook.webhook.delay_time > 0:
         logger.info(f"Agendando evento '{event.event_name}' para {event.schema_name}/{event.domain_id}: {event.id}")
         await event_tasks.dispatch_event(event)
 
@@ -64,8 +69,3 @@ async def trigger_pending_events():
     batch_id = str(uuid.uuid4())
 
     logger.info(f'Buscando eventos: batch_id={batch_id}')
-    # events = await event_repository.find_and_update_pending_events(batch_id)
-
-    # for event in events:
-    #     logger.info(f'Disparando evento: {event.id}')
-        # await dispatch_event(event)

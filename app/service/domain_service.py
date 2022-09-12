@@ -4,7 +4,6 @@ from jsonschema.exceptions import ValidationError, SchemaError
 from jsonschema.validators import validate
 
 from app.domain.domain import DomainSchema, Domain, DomainEvent, DomainEventStatus
-from app.domain.hook import Hook
 from app.repository import base_repository, event_respository
 from app.service import schema_service, event_service, hook_service, expression_service
 from app.service.exceptions import RecordNotFoundException, ValidationException

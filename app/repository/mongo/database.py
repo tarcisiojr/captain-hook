@@ -17,6 +17,7 @@ from app.repository.utils import split_key_and_values, fill_audit
 
 E = typing.TypeVar("E", bound=HookBaseDomain)
 
+
 class DateCodec(TypeCodec):
     python_type = date
     bson_type = datetime

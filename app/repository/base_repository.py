@@ -4,9 +4,11 @@ from typing import Type
 
 from bson import ObjectId
 from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
 from pymongo.results import InsertOneResult
 
 from app.domain.hook import HookBaseDomain
+from app.repository.exceptions import IntegrityException
 from app.repository.mongo import database
 from app.repository.mongo.database import default_database, from_mongo
 from app.repository.utils import split_key_and_values, get_collection_name, fill_audit
@@ -25,11 +27,15 @@ def _set_document_id(document: dict):
 
 
 async def create(entity: E) -> E:
-    mongo_dict = await fill_audit(_set_document_id(entity.dict()))
-    insert_result: InsertOneResult = await default_database[get_collection_name(entity)].insert_one(mongo_dict)
-    document_id = insert_result.inserted_id
-    inserted_document = {"_id": document_id, **mongo_dict}
-    entity = from_mongo(type(entity), inserted_document)
+    try:
+        mongo_dict = await fill_audit(_set_document_id(entity.dict()))
+        insert_result: InsertOneResult = await default_database[get_collection_name(entity)].insert_one(mongo_dict)
+        document_id = insert_result.inserted_id
+        inserted_document = {"_id": document_id, **mongo_dict}
+        entity = from_mongo(type(entity), inserted_document)
+    except DuplicateKeyError:
+        raise IntegrityException("Duplicate key error")
+
     return entity
 
 

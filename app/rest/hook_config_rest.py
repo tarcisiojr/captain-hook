@@ -12,7 +12,7 @@ router = APIRouter(
     tags=['Config'],
 )
 
-URL_BASE = '/api/v1/configs'
+URL_BASE = '/api/v1/hooks'
 
 
 @router.post(
