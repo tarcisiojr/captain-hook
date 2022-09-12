@@ -38,7 +38,7 @@ def _exception_handler(_request: Request, _exc: Exception):
         return JSONResponse(status_code=404, content={"message": str(_exc), "detail": _exc.details})
 
     if isinstance(_exc, IntegrityException):
-        return JSONResponse(status_code=422, content={})
+        return JSONResponse(status_code=422, content={"message": str(_exc), "detail": None})
 
     if isinstance(_exc, ValidationException):
         return JSONResponse(status_code=422, content={"message": str(_exc), "detail": _exc.details})

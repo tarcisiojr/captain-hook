@@ -59,7 +59,6 @@ class HookConfigRequest(HookBaseDomain):
     schema_name: str = Field(..., example='price')
     event_name: str = Field(..., example='price_changed')
     condition: Optional[str] = Field(None, example='event.metadata.new_price > 20000')
-    delay_time: Optional[int] = Field(0, description='Tempo em minutos para disparo do hook.')
     webhook: Optional[WebhookRequest]
     tags: Optional[List[str]] = Field(..., example=["tenant-x"])
 

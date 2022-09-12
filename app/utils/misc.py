@@ -5,19 +5,9 @@ from typing import Any
 
 from bson import ObjectId
 
-INFINITY = datetime.max.replace(tzinfo=timezone.utc)
-
-
-def utcnow():
-    return datetime.utcnow().replace(tzinfo=timezone.utc)
-
 
 def encode_datetime(dt: datetime):
     return dt.replace(tzinfo=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
-
-
-def encode_object_id(oid: ObjectId):
-    return str(oid)
 
 
 def get_meta(entity: Any, attribute: str, raise_exc: bool = True):
@@ -25,7 +15,7 @@ def get_meta(entity: Any, attribute: str, raise_exc: bool = True):
         return getattr(entity.Meta, attribute)
 
     if raise_exc:
-        raise TypeError(f"A entidade {type(entity)} não possui o meta: {attribute}")
+        raise TypeError(f"Entity {type(entity)} does not have meta attribute: {attribute}")
 
     return None
 

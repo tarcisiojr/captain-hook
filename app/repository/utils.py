@@ -1,10 +1,11 @@
 import typing
+from datetime import datetime
 
 from bson import ObjectId
 
 from app.domain.hook import OID, HookBaseDomain
 from app.repository.exceptions import RepositoryException
-from app.utils.misc import get_meta, utcnow
+from app.utils.misc import get_meta
 
 E = typing.TypeVar("E", bound=HookBaseDomain)
 
@@ -41,7 +42,7 @@ def get_collection_name(entity: E) -> str:
 
 
 def create_audit_info():
-    now = utcnow()
+    now = datetime.utcnow()
     sub, iss = 'unknown', 'unknown'
     audit_info = {"updated_by": {"subject": sub, "issuer": iss}, "updated_at": now}
     return audit_info

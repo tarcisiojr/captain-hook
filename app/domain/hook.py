@@ -58,6 +58,6 @@ class Hook(HookBaseDomain):
     tags: Optional[List[str]]
 
     class Meta:
-        collection_name: str = "domain_schema"
+        collection_name: str = "hook"
         key = ('id', )
 

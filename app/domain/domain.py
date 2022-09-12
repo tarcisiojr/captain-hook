@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import Optional, List
 
@@ -44,6 +45,7 @@ class DomainEvent(HookBaseDomain):
     metadata: Optional[dict]
     status: Optional[DomainEventStatus]
     hook: Optional[Hook]
+    eta: Optional[datetime]
 
     class Meta:
         collection_name: str = "domain_event"

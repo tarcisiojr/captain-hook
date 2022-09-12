@@ -1,9 +1,11 @@
+from datetime import timedelta, datetime
 from typing import List
 
 from jsonschema.exceptions import ValidationError, SchemaError
 from jsonschema.validators import validate
 
 from app.domain.domain import DomainSchema, Domain, DomainEvent, DomainEventStatus
+from app.domain.hook import Hook, HookType
 from app.repository import base_repository, event_respository
 from app.service import schema_service, event_service, hook_service, expression_service
 from app.service.exceptions import RecordNotFoundException, ValidationException
@@ -45,6 +47,12 @@ def _get_vars(event, domain):
     }
 
 
+def _calculate_eta(hook: Hook):
+    if hook.type == HookType.WEBHOOK:
+        return datetime.utcnow() + timedelta(minutes=hook.webhook.delay_time if hook.webhook.delay_time else 0)
+    return datetime.utcnow()
+
+
 async def insert_event(event: DomainEvent) -> List[DomainEvent]:
     await schema_service.exists_schema(event.schema_name)
     domain = await get_domain_by_id(event.schema_name, event.domain_id)
@@ -55,9 +63,10 @@ async def insert_event(event: DomainEvent) -> List[DomainEvent]:
     for hook in hooks:
         if not hook.condition or expression_service.evaluate(hook.condition, _get_vars(event, domain)):
             events.append(DomainEvent(
-                **event.dict(exclude={'status', 'hook'}),
+                **event.dict(exclude={'status', 'hook', 'eta'}),
                 status=DomainEventStatus.CREATED,
-                hook=hook
+                hook=hook,
+                eta=_calculate_eta(hook)
             ))
 
     if not events:

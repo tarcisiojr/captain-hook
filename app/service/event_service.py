@@ -1,6 +1,5 @@
 import logging
-import uuid
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import requests
 
@@ -8,7 +7,6 @@ from app.domain.domain import DomainEvent, DomainEventStatus
 from app.domain.hook import HookType
 from app.repository import event_respository, base_repository
 from app.task import event_tasks
-
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +26,7 @@ async def _process_webhook(event: DomainEvent):
 
 
 async def dispatch_event(event: DomainEvent):
-    if event.hook.type == HookType.WEBHOOK and event.hook.webhook.delay_time > 0:
+    if event.hook.type == HookType.WEBHOOK and event.hook.webhook.delay_time <= 0:
         logger.info(f"Agendando evento '{event.event_name}' para {event.schema_name}/{event.domain_id}: {event.id}")
         await event_tasks.dispatch_event(event)
 
@@ -59,13 +57,12 @@ async def mark_event_as_failure(sellout_id: str, event_id: str, exc):
     pass
 
 
-async def schedule_event(event, delay: int):
-    # event.status = EventStatus.SCHEDULED
-    event.eta = datetime.utcnow() + timedelta(hours=delay)
-    # await event_repository.update_event(event)
-
-
 async def trigger_pending_events():
-    batch_id = str(uuid.uuid4())
+    events = await event_respository.find_pending_events(datetime.utcnow())
 
-    logger.info(f'Buscando eventos: batch_id={batch_id}')
+    logger.info(f'Starting processing of scheduled events...')
+
+    for event in events:
+        await event_tasks.dispatch_event(event)
+
+    logger.info(f'End of processing of scheduled events.')

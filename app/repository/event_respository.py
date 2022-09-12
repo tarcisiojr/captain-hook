@@ -26,3 +26,13 @@ async def get_event_and_mark_processing(event_id: str) -> None | DomainEvent:
     if ret:
         return database.from_mongo(DomainEvent, ret)
     return None
+
+
+async def find_pending_events(limit_date) -> List[DomainEvent]:
+    cursor = _get_collection().find(
+        {
+            'status': DomainEventStatus.CREATED,
+            'eta': {'$lte': limit_date}
+        }
+    )
+    return [database.from_mongo(DomainEvent, row) async for row in cursor]
