@@ -36,3 +36,20 @@ async def find_pending_events(limit_date) -> List[DomainEvent]:
         }
     )
     return [database.from_mongo(DomainEvent, row) async for row in cursor]
+
+
+async def find_events(schema_name, event_name=None, queue_name=None, skip: int = 0, limit: int = 100):
+    limits = {"skip": skip, "limit": limit}
+    filters = {'schema_name': schema_name}
+
+    if limit <= 0:
+        limits = {}
+
+    if event_name:
+        filters['event_name'] = event_name
+
+    if queue_name:
+        filters['hook'] = {'queue_name': queue_name}
+
+    cursor = _get_collection().find(filters, **limits)
+    return [database.from_mongo(DomainEvent, row) async for row in cursor]

@@ -70,3 +70,7 @@ async def trigger_pending_events():
         await event_tasks.dispatch_event(event)
 
     logger.info(f'End of processing of scheduled events.')
+
+
+async def find_events_of_schema(schema_name, event_name=None, queue_name=None, skip: int = 0, limit: int = 100):
+    return await event_respository.find_events(schema_name, event_name, queue_name, skip, limit)

@@ -41,6 +41,11 @@ class FindDomainRequest(Pagination, HookBaseDomain):
     domain_id: Optional[str] = Field(None, example='1234567890')
 
 
+class FindEventsRequest(Pagination, HookBaseDomain):
+    event_name: Optional[str] = Field(None, example='price_changed')
+    queue_name: Optional[str] = Field(None, example='default')
+
+
 class DomainEventRequest(HookBaseDomain):
     event_name: str = Field(..., example='price_changed')
     metadata: Optional[dict] = Field(..., example={"new_price": 30050})

@@ -34,7 +34,7 @@ def _process_event(event_id):
 
 @celery.task()
 def trigger_events():
-    logger.info('Disparando processamento de mensagens.')
+    logger.info('Triggering pending events...')
     _call_service(event_service.trigger_pending_events)
 
 
@@ -42,5 +42,5 @@ async def dispatch_event(event: DomainEvent):
     await run_in_executor(
         _process_event.s(str(event.id)).apply_async,
         retry=True,
-        queue=event.hook.webhook.queue_name or 'default',
+        queue=event.hook.queue_name or 'default',
         retry_policy={'max_retries': event.hook.webhook.max_retries})

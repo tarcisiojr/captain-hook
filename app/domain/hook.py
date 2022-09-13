@@ -46,7 +46,6 @@ class Webhook(HookBaseDomain):
     timeout: Optional[int] = Field(3)
     max_retries: Optional[int] = Field(3)
     attempts: Optional[int] = Field(0)
-    queue_name: Optional[str] = Field('default')
 
 
 class Hook(HookBaseDomain):
@@ -57,6 +56,7 @@ class Hook(HookBaseDomain):
     condition: Optional[str]
     webhook: Optional[Webhook]
     tags: Optional[List[str]]
+    queue_name: Optional[str] = Field('default')
 
     class Meta:
         collection_name: str = "hook"
