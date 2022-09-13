@@ -7,18 +7,18 @@ client = TestClient(app)
 
 def test_crud_create_schema():
     payload = {
-      "name": "price",
-      "domain_schema": {
-        "type": "object",
-        "properties": {
-          "price": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          }
+        "name": "price",
+        "domain_schema": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
         }
-      }
     }
 
     ret = client.post('/api/v1/schemas', json=payload)

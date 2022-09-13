@@ -14,7 +14,7 @@ class DomainSchema(HookBaseDomain):
 
     class Meta:
         collection_name: str = "domain_schema"
-        key = ('name', )
+        key = ('name',)
 
 
 class Domain(HookBaseDomain):
@@ -25,7 +25,7 @@ class Domain(HookBaseDomain):
 
     class Meta:
         collection_name: str = "domain"
-        key = ('schema_name', 'domain_id', )
+        key = ('schema_name', 'domain_id',)
 
 
 class DomainEventStatus(str, Enum):
@@ -46,7 +46,8 @@ class DomainEvent(HookBaseDomain):
     status: Optional[DomainEventStatus]
     hook: Optional[Hook]
     eta: Optional[datetime]
+    failure_message: Optional[str]
 
     class Meta:
         collection_name: str = "domain_event"
-        key = ('id', )
+        key = ('id',)

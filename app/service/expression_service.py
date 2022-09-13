@@ -114,7 +114,6 @@ def evaluate(expression, variables):
     ret = exp.parse_string(expression, parse_all=True)[0]
     return ret
 
-
 # if __name__ == '__main__':
 #     print(evaluate("event.ff == 30 and sellout.a >= 10", {
 #         'sellout': {'a': 10, 'ff': 1},

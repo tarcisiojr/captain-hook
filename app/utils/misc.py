@@ -30,4 +30,3 @@ class JsonEncoders(json.JSONEncoder):
 
 def encode_str(s: str) -> bytes:
     return s.encode("utf-8")
-

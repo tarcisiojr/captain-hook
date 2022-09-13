@@ -13,7 +13,6 @@ from app.repository.mongo import database
 from app.repository.mongo.database import default_database, from_mongo
 from app.repository.utils import split_key_and_values, get_collection_name, fill_audit
 
-
 E = typing.TypeVar("E", bound=HookBaseDomain)
 
 
