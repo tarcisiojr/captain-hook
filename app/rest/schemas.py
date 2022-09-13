@@ -3,6 +3,7 @@ from typing import Optional, Dict, List
 from fastapi.openapi.models import Schema
 from pydantic import BaseModel, Field, HttpUrl
 
+from app.domain.domain import DomainEventStatus
 from app.domain.hook import HookBaseDomain, HookType
 
 
@@ -44,6 +45,10 @@ class FindDomainRequest(Pagination, HookBaseDomain):
 class FindEventsRequest(Pagination, HookBaseDomain):
     event_name: Optional[str] = Field(None, example='price_changed')
     queue_name: Optional[str] = Field(None, example='default')
+
+
+class UpdateEventRequest(HookBaseDomain):
+    status: DomainEventStatus = Field(None, example=DomainEventStatus.PROCESSED)
 
 
 class DomainEventRequest(HookBaseDomain):

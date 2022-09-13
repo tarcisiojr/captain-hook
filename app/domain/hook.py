@@ -51,11 +51,11 @@ class Webhook(HookBaseDomain):
 class Hook(HookBaseDomain):
     id: Optional[OID]
     type: Optional[HookType]
+    tags: Optional[List[str]]
     schema_name: Optional[str]
     event_name: Optional[str]
     condition: Optional[str]
     webhook: Optional[Webhook]
-    tags: Optional[List[str]]
     queue_name: Optional[str] = Field('default')
 
     class Meta:

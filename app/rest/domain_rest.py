@@ -3,8 +3,9 @@ from typing import List
 from fastapi import APIRouter, status, Depends, Path
 
 from app.domain.domain import Domain, DomainEvent
+from app.domain.hook import OID
 from app.rest import utils
-from app.rest.schemas import DomainRequest, DomainEventRequest, FindDomainRequest, FindEventsRequest
+from app.rest.schemas import DomainRequest, DomainEventRequest, FindDomainRequest, FindEventsRequest, UpdateEventRequest
 from app.service import domain_service, base_service, event_service
 
 router = APIRouter(
@@ -69,3 +70,12 @@ async def get_events(name: str, params: FindEventsRequest = Depends()):
         event_name=params.event_name,
         queue_name=params.queue_name,
         **pagination)
+
+
+@router.patch(
+    f"{URL_BASE}/events/{{event_id}}",
+    response_model=DomainEvent,
+    status_code=status.HTTP_200_OK
+)
+async def get_events(name: str, event_id: OID, event: UpdateEventRequest):
+    return await event_service.update_event_status(schema_name=name, event_id=event_id, status=event.status)

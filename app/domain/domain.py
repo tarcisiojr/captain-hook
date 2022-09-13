@@ -44,9 +44,9 @@ class DomainEvent(HookBaseDomain):
     domain_id: Optional[str]
     metadata: Optional[dict]
     status: Optional[DomainEventStatus]
-    hook: Optional[Hook]
     eta: Optional[datetime]
     failure_message: Optional[str]
+    hook: Optional[Hook]
 
     class Meta:
         collection_name: str = "domain_event"

@@ -6,6 +6,7 @@ import requests
 from app.domain.domain import DomainEvent, DomainEventStatus
 from app.domain.hook import HookType, OID
 from app.repository import event_respository, base_repository
+from app.service.exceptions import RecordNotFoundException, ValidationException
 from app.task import event_tasks
 
 logger = logging.getLogger(__name__)
@@ -74,3 +75,22 @@ async def trigger_pending_events():
 
 async def find_events_of_schema(schema_name, event_name=None, queue_name=None, skip: int = 0, limit: int = 100):
     return await event_respository.find_events(schema_name, event_name, queue_name, skip, limit)
+
+
+async def update_event_status(schema_name: str, event_id: str, status: DomainEventStatus) -> DomainEvent:
+    events = await base_repository.find_by_example(
+        DomainEvent(id=event_id, schema_name=schema_name), return_as=DomainEvent)
+
+    if not events:
+        raise RecordNotFoundException(f'Event not found: {schema_name}/{str(event_id)}')
+
+    event = events[0]
+
+    if event.hook == HookType.WEBHOOK:
+        raise ValidationException(f'Webhook events does not allow update')
+
+    if event.status not in (DomainEventStatus.CREATED, DomainEventStatus.PROCESSING):
+        raise ValidationException(f'Event status does not allow changes: {event.status}')
+
+    event.status = status
+    return await base_repository.update(event)
