@@ -77,7 +77,7 @@ curl -X 'POST' \
   "type": "webhook",
   "schema_name": "price",
   "event_name": "price_changed",
-  "condition": None,
+  "condition": null,
   "webhook": {
     "callback_url": "https://sistema-b.com/",
     "delay_time": 0,
