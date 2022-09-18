@@ -74,7 +74,8 @@ async def trigger_pending_events():
 
 
 async def find_events_of_schema(schema_name, event_name=None, queue_name=None, skip: int = 0, limit: int = 100):
-    return await event_respository.find_events(schema_name, event_name, queue_name, skip, limit)
+    ret = await event_respository.find_events(schema_name, event_name, queue_name, skip, limit)
+    return ret
 
 
 async def update_event_status(schema_name: str, event_id: str, status: DomainEventStatus) -> DomainEvent:

@@ -56,7 +56,7 @@ class Hook(HookBaseDomain):
     event_name: Optional[str]
     condition: Optional[str]
     webhook: Optional[Webhook]
-    queue_name: Optional[str] = Field('default')
+    queue_name: Optional[str]
 
     class Meta:
         collection_name: str = "hook"

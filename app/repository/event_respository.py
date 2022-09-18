@@ -49,7 +49,7 @@ async def find_events(schema_name, event_name=None, queue_name=None, skip: int =
         filters['event_name'] = event_name
 
     if queue_name:
-        filters['hook'] = {'queue_name': queue_name}
+        filters['hook.queue_name'] = queue_name
 
     cursor = _get_collection().find(filters, **limits)
     return [database.from_mongo(DomainEvent, row) async for row in cursor]

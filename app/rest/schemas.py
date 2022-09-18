@@ -70,6 +70,7 @@ class HookConfigRequest(HookBaseDomain):
     event_name: str = Field(..., example='price_changed')
     condition: Optional[str] = Field(None, example='event.metadata.new_price > 20000')
     webhook: Optional[WebhookRequest]
+    queue_name: Optional[str] = Field('default', description='Queue name for manual consumption.')
     tags: Optional[List[str]] = Field(..., example=["tenant-x"])
 
 

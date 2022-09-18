@@ -77,5 +77,5 @@ async def get_events(name: str, params: FindEventsRequest = Depends()):
     response_model=DomainEvent,
     status_code=status.HTTP_200_OK
 )
-async def get_events(name: str, event_id: OID, event: UpdateEventRequest):
+async def patch_events(name: str, event_id: OID, event: UpdateEventRequest):
     return await event_service.update_event_status(schema_name=name, event_id=event_id, status=event.status)
