@@ -62,18 +62,8 @@ def test_crud_create_hook():
 def test_invalid_payload():
     payload = {
         "abc": "price",
-        "xxx": {
-            "type": "object",
-            "properties": {
-                "price": {
-                    "type": "number"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        }
+        "xxx": {}
     }
 
-    ret = client.post('/api/v1/schemas', json=payload)
+    ret = client.post('/api/v1/hooks', json=payload)
     assert ret.status_code == 422

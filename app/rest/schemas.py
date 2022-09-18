@@ -4,7 +4,7 @@ from fastapi.openapi.models import Schema
 from pydantic import BaseModel, Field, HttpUrl
 
 from app.domain.domain import DomainEventStatus
-from app.domain.hook import HookBaseDomain, HookType
+from app.domain.hook import HookBaseDomain, HookType, OID
 
 
 class Pagination(BaseModel):
@@ -45,6 +45,7 @@ class FindDomainRequest(Pagination, HookBaseDomain):
 class FindEventsRequest(Pagination, HookBaseDomain):
     event_name: Optional[str] = Field(None, example='price_changed')
     queue_name: Optional[str] = Field(None, example='default')
+    id: Optional[OID] = Field(None, description='Event id')
 
 
 class UpdateEventRequest(HookBaseDomain):

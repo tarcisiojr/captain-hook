@@ -9,7 +9,7 @@ from app.rest.schemas import DomainRequest, DomainEventRequest, FindDomainReques
 from app.service import domain_service, base_service, event_service
 
 router = APIRouter(
-    tags=['Hook'],
+    tags=['Domain'],
 )
 
 URL_BASE = '/api/v1/schemas/{name}'
@@ -46,7 +46,8 @@ async def delete_domain(name: str, domain_id: str):
 
 @router.post(
     f"{URL_BASE_DOMAIN}/{{domain_id}}/events",
-    response_model=List[DomainEvent]
+    response_model=List[DomainEvent],
+    status_code=status.HTTP_201_CREATED
 )
 async def post_domain_event(event: DomainEventRequest,
                             name: str = Path(example='price'),
@@ -67,6 +68,7 @@ async def get_events(name: str, params: FindEventsRequest = Depends()):
 
     return await event_service.find_events_of_schema(
         schema_name=name,
+        event_id=params.id,
         event_name=params.event_name,
         queue_name=params.queue_name,
         **pagination)

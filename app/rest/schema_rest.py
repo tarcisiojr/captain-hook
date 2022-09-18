@@ -9,7 +9,7 @@ from app.rest.schemas import DomainSchemaRequest, FindDomainSchemaRequest, KeyDo
 from app.service import base_service
 
 router = APIRouter(
-    tags=['Hook'],
+    tags=['Schema'],
 )
 
 URL_BASE = '/api/v1/schemas'
