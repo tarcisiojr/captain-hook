@@ -51,7 +51,7 @@ async def delete_domain(name: str, domain_id: str):
 async def post_domain_event(event: DomainEventRequest,
                             name: str = Path(example='price'),
                             domain_id: str = Path(example='1234567890')):
-    return await domain_service.insert_event(DomainEvent(
+    return await event_service.insert_event(DomainEvent(
         **event.dict(),
         schema_name=name,
         domain_id=domain_id))
