@@ -21,11 +21,11 @@ async def get_health():
     return "ok"
 
 
-@router.post(
-    URL_BASE,
-    response_model=dict,
-    status_code=status.HTTP_200_OK
-)
-async def post_health(payload: dict):
-    logger.info(f'Healthcheck POST: {str(payload)}')
-    return payload
+# @router.post(
+#     URL_BASE,
+#     response_model=dict,
+#     status_code=status.HTTP_200_OK
+# )
+# async def post_health(payload: dict):
+#     logger.info(f'Healthcheck POST: {str(payload)}')
+#     return payload
